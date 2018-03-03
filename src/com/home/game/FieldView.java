@@ -132,7 +132,12 @@ public class FieldView implements FieldObserver, ActionListener {
                                           fieldModel.getCellSize());
                 gamePanel.getImgElements(fieldModel.getBombsImg(),
                                          fieldModel.getFlagImg(),
-                                         fieldModel.getQuestionImg());
+                                         fieldModel.getQuestionImg(),
+                                         fieldModel.getGroundImagePuzzle(),
+                                         fieldModel.getGroundLightImagePuzzle(),
+                                         fieldModel.getUnderGroundImagePuzzle(),
+                                         fieldModel.getGroundImageScale(),
+                                         fieldModel.getUnderGroundImageScale());
                 gamePanel.setPreferredSize(new Dimension(gameWidth+1,gameHeight+1));
                 SpringLayout springLayout = new SpringLayout();
                 mainFrame.setLayout(springLayout);
@@ -353,6 +358,15 @@ public class FieldView implements FieldObserver, ActionListener {
         settingsOk.setBounds(287,220,50,25);
     }
 
+    public void winGame(int winGame){
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                "Congratulations you win!\nTime: " + winGame+" seconds.\nWould you like exit?",
+                "You win",
+                JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.NO_OPTION) controller.newGame();
+        else if (result == JOptionPane.YES_OPTION) controller.exitGame();
+    }
     public void endGame(){
         int result = JOptionPane.showConfirmDialog(
                 null,
@@ -366,6 +380,7 @@ public class FieldView implements FieldObserver, ActionListener {
     @Override
     public void update() {
             gamePanel.updateInnerUpLayer(fieldModel.getInfoUpLayer(), fieldModel.getMarkInfo());
+            minePanel.updateValue(fieldModel.getNumberMarksFlag());
             gamePanel.updateBrightCell(fieldModel.getBrightCell());
             if (fieldModel.getExplosionState()) {
                 gamePanel.updateAnimateLayer(fieldModel.getExplosionCoordinates(),
@@ -374,6 +389,7 @@ public class FieldView implements FieldObserver, ActionListener {
             }
             controller.checkWasDetonated();
             timePanel.updateValue(fieldModel.getCurrentTime()/10);
+            controller.checkWin();
     }
 
     @Override

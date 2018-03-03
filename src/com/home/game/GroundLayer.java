@@ -396,6 +396,17 @@ public class GroundLayer implements UpLayer {
     }
 
     @Override
+    public int getNumberCloseCell() {
+        int result = 0;
+        for (int i = 0; i < innerDataArr.length; i++) {
+            for (int j = 0; j < innerDataArr[i].length; j++) {
+                if(innerDataArr[i][j]==false) result++;
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void setMark(int y, int x) {
         if(!innerDataArr[y][x]&&innerMarkArr[y][x]==0) innerMarkArr[y][x] = 1;
         else if(!innerDataArr[y][x]&&innerMarkArr[y][x]==1) innerMarkArr[y][x] = 2;
@@ -416,6 +427,17 @@ public class GroundLayer implements UpLayer {
     @Override
     public int[][] getMarkInfo() {
         return innerMarkArr;
+    }
+
+    @Override
+    public int getNumberMarksFlag() {
+        int result=0;
+        for (int i = 0; i < innerMarkArr.length; i++) {
+            for (int j = 0; j < innerMarkArr[i].length; j++) {
+                if(innerMarkArr[i][j]==1) result++;
+            }
+        }
+        return result;
     }
 
     @Override

@@ -17,6 +17,11 @@ public class GamePanel extends GamePanelAbstract {
     private BufferedImage flagImg = null;
     private BufferedImage questionImg = null;
     private BufferedImage bombImg = null;
+    private BufferedImage[][] groundImgPuzzle = null;
+    private BufferedImage[][] groundLightImgPuzzle = null;
+    private BufferedImage[][] underGroundImgPuzzle = null;
+    private int groundScale = 1;
+    private int underGroundScale = 1;
 
     private BufferedImage explosionImg = null;
 
@@ -50,8 +55,12 @@ public class GamePanel extends GamePanelAbstract {
             for (int j = 0; j < setRectangles[i].length; j++) {
                 //draw ground
                 g2.setColor(new Color(200,128,18));
-                g2.fillRect((int)setRectangles[i][j].getX(), (int)setRectangles[i][j].getY(),
-                        (int)setRectangles[i][j].getWidth(), (int)setRectangles[i][j].getHeight());
+                /*g2.fillRect((int)setRectangles[i][j].getX(), (int)setRectangles[i][j].getY(),
+                        (int)setRectangles[i][j].getWidth(), (int)setRectangles[i][j].getHeight());*/
+                g2.drawImage(underGroundImgPuzzle[i%underGroundScale][j%underGroundScale],
+                        (int)setRectangles[i][j].getX(), (int)setRectangles[i][j].getY(),
+                        cellSize,cellSize,
+                        this);
 
                 //draw grid
                 g2.setColor(Color.BLACK);
@@ -110,16 +119,13 @@ public class GamePanel extends GamePanelAbstract {
                 if (setUpRectangles[i][j] != null &&
                         !innerUpLayer[i][j]) {
                     if(i==brightRect[0]&&j==brightRect[1]) {
-                        /*g2.drawImage(bigGrassLight, (int)setUpRectangles[i][j].getX(), (int)setUpRectangles[i][j].getY(),
-                                (int)(setUpRectangles[i][j].getX()+setUpRectangles[i][j].getWidth()),
-                                (int)(setUpRectangles[i][j].getY()+setUpRectangles[i][j].getHeight()),
-                                (int)setUpRectangles[i][j].getX(), (int)setUpRectangles[i][j].getY(),
-                                (int)(setUpRectangles[i][j].getX()+setUpRectangles[i][j].getWidth()),
-                                (int)(setUpRectangles[i][j].getY()+setUpRectangles[i][j].getHeight()),
-                                this);*/
-                        g2.setColor(new Color(170,220,35));
+                        g2.drawImage(groundLightImgPuzzle[i%groundScale][j%groundScale],
+                                (int)setRectangles[i][j].getX(), (int)setRectangles[i][j].getY(),
+                                cellSize,cellSize,
+                                this);
+                        /*g2.setColor(new Color(170,220,35));
                         g2.fillRect((int)setUpRectangles[i][j].getX(), (int)setUpRectangles[i][j].getY(),
-                                (int)setUpRectangles[i][j].getWidth(), (int)setUpRectangles[i][j].getHeight());
+                                (int)setUpRectangles[i][j].getWidth(), (int)setUpRectangles[i][j].getHeight());*/
 
                         g2.setColor(new Color(110,65,45));
                         g2.setStroke(new BasicStroke(4));
@@ -136,17 +142,14 @@ public class GamePanel extends GamePanelAbstract {
                     }
                     else {
                         //Рисуем траву
-                        /*g2.drawImage(bigGrass, (int)setUpRectangles[i][j].getX(), (int)setUpRectangles[i][j].getY(),
-                                (int)(setUpRectangles[i][j].getX()+setUpRectangles[i][j].getWidth()),
-                                (int)(setUpRectangles[i][j].getY()+setUpRectangles[i][j].getHeight()),
-                                (int)setUpRectangles[i][j].getX(), (int)setUpRectangles[i][j].getY(),
-                                (int)(setUpRectangles[i][j].getX()+setUpRectangles[i][j].getWidth()),
-                                (int)(setUpRectangles[i][j].getY()+setUpRectangles[i][j].getHeight()),
-                                this);*/
+                        g2.drawImage(groundImgPuzzle[i%groundScale][j%groundScale],
+                                (int)setRectangles[i][j].getX(), (int)setRectangles[i][j].getY(),
+                                cellSize,cellSize,
+                                this);
                         //g2.setColor(Color.RED);
-                        g2.setColor(new Color(125,175,35));
+                        /*g2.setColor(new Color(125,175,35));
                         g2.fillRect((int)setUpRectangles[i][j].getX(), (int)setUpRectangles[i][j].getY(),
-                                (int)setUpRectangles[i][j].getWidth(), (int)setUpRectangles[i][j].getHeight());
+                                (int)setUpRectangles[i][j].getWidth(), (int)setUpRectangles[i][j].getHeight());*/
 
                         g2.setColor(new Color(110,65,45));
                         g2.setStroke(new BasicStroke(4));
@@ -248,9 +251,16 @@ public class GamePanel extends GamePanelAbstract {
     }
 
     @Override
-    public void getImgElements(BufferedImage bombImg, BufferedImage flagImg, BufferedImage questionImg) {
+    public void getImgElements(BufferedImage bombImg, BufferedImage flagImg, BufferedImage questionImg,
+                               BufferedImage[][] groundImagePuzzle, BufferedImage[][] groundLightImagePuzzle,
+                               BufferedImage[][] underGroundImagePuzzle, int groundScale, int underGroundScale) {
         this.bombImg = bombImg;
         this.flagImg = flagImg;
         this.questionImg = questionImg;
+        this.groundImgPuzzle = groundImagePuzzle;
+        this.groundLightImgPuzzle = groundLightImagePuzzle;
+        this.underGroundImgPuzzle = underGroundImagePuzzle;
+        this.groundScale = groundScale;
+        this.underGroundScale = groundScale;
     }
 }

@@ -14,7 +14,9 @@ public abstract class GamePanelAbstract extends JPanel {
     abstract public void updateInnerUpLayer(boolean[][] innerUpLayer, int[][]innerMarkInfo);
 
     abstract public void updateBrightCell(int[] brightCell);
-    public abstract void getImgElements(BufferedImage bombImg, BufferedImage flagImg, BufferedImage questionImg);
+    public abstract void getImgElements(BufferedImage bombImg, BufferedImage flagImg, BufferedImage questionImg,
+                                        BufferedImage[][] groundImagePuzzle, BufferedImage[][] groundLightImagePuzzle,
+                                        BufferedImage[][] underGroundImagePuzzle, int groundScale, int underGroudnScale);
 
     public Rectangle2D[][] getSetUpRectangles() {
         return setUpRectangles;

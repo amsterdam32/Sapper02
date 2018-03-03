@@ -17,26 +17,35 @@ public class FieldModel implements FieldModelInterface, ActionListener {
 
     private InfoBombsField infoField;
     private UpLayer groundLayer;
+    private ImagePuzzleInterface underGroudImagePuzzle;
+    private ImagePuzzleInterface groundImagePuzzle;
+    private ImagePuzzleInterface groundLightImagePuzzle;
     private AnimateLayer explosionLayer;
 
     private ArrayList<FieldObserver> fieldObservers;
 
-    private boolean isExplosion = false;
+    private boolean wasExplosion = false;
     private boolean findBomb = false;
     private BufferedImage frame = null;
 
     private BufferedImage flagImg = null;
     private BufferedImage questionImg = null;
     private BufferedImage bombImg = null;
+    private BufferedImage groundImg = null;
+    private BufferedImage groundLightImg = null;
+    private BufferedImage underGroundImg = null;
+    private int underGroundImageScale;
+    private int groundImageScale;
 
     private Timer explosionTimer;
     private Timer clockTimer;
     private int currentTime;
 
     private boolean gameIsStart = false;
+    private boolean gameIsEnd = false;
 
     public FieldModel(){
-        this(20,20,40);
+        this(9,9,10);
     }
 
     public FieldModel(int height, int width, int numberBombs) {
@@ -47,16 +56,27 @@ public class FieldModel implements FieldModelInterface, ActionListener {
         infoField.setBombs(numberBombs);
         groundLayer = new GroundLayer(height,width, infoField.getInfoFields());
         fieldObservers = new ArrayList<FieldObserver>();
+        startClock();
+
+    }
+
+    @Override
+    public void loadImg() {
         try {
             explosionLayer = new AnimateExplosionLayer(ImageIO.read(new File("pic/explosionSprite512_512.png")));
             bombImg = ImageIO.read(new File("pic/bomb40_40.png"));
             flagImg = ImageIO.read(new File("pic/flag40_40.png"));
             questionImg = ImageIO.read(new File("pic/questionMark40_40.png"));
+            underGroundImg = ImageIO.read(new File("pic/ground600_600.jpg"));
+            groundImg = ImageIO.read(new File("pic/grass600_600.jpg"));
+            groundLightImg = ImageIO.read(new File("pic/grassLight600_600.jpg"));
+            groundImagePuzzle = new ImagePuzzle(groundImg, getGroundImageScale());
+            groundLightImagePuzzle = new ImagePuzzle(groundLightImg, getGroundImageScale());
+            underGroudImagePuzzle = new ImagePuzzle(underGroundImg, getUnderGroundImageScale());
+
         } catch (IOException e) {
             explosionLayer = null;
         }
-        startClock();
-        //notifyObservers();
     }
 
     @Override
@@ -67,6 +87,41 @@ public class FieldModel implements FieldModelInterface, ActionListener {
     @Override
     public boolean[][] getInfoUpLayer() {
         return groundLayer.getDataLayer();
+    }
+
+    @Override
+    public BufferedImage[][] getGroundImagePuzzle() {
+        return groundImagePuzzle.getImagePuzzle();
+    }
+
+    @Override
+    public BufferedImage[][] getGroundLightImagePuzzle() {
+        return groundLightImagePuzzle.getImagePuzzle();
+    }
+
+    @Override
+    public BufferedImage[][] getUnderGroundImagePuzzle() {
+        return underGroudImagePuzzle.getImagePuzzle();
+    }
+
+    @Override
+    public int getGroundImageScale() {
+        return groundImageScale;
+    }
+
+    @Override
+    public void setGroundImageScale(int scale) {
+        this.groundImageScale = scale;
+    }
+
+    @Override
+    public int getUnderGroundImageScale() {
+        return underGroundImageScale;
+    }
+
+    @Override
+    public void setUnderGroundImageScale(int scale) {
+        this.underGroundImageScale = scale;
     }
 
     @Override
@@ -81,11 +136,29 @@ public class FieldModel implements FieldModelInterface, ActionListener {
     }
 
     @Override
+    public int getNumberMarksFlag() {
+        return getNumberBombs() - groundLayer.getNumberMarksFlag();
+    }
+
+    @Override
+    public boolean checkGameStateWin() {
+        if(groundLayer.getNumberCloseCell()==getNumberBombs()&&
+                !wasExplosion&&!gameIsEnd) return true;
+        else return false;
+    }
+
+    @Override
+    public void setGameIsEnd(boolean state) {
+        gameIsEnd = state;
+    }
+
+    @Override
     public void openCell(int y, int x) {
         gameIsStart = true;
         if (!groundLayer.getDataLayer()[y][x]&&groundLayer.getMarkInfo()[y][x]!=1) {
             groundLayer.openCell(y,x);
             if(groundLayer.isBomb()) {
+                wasExplosion = true;
                 startExplosion(x, y);
                 groundLayer.takeOffBomb();
             }
@@ -212,6 +285,11 @@ public class FieldModel implements FieldModelInterface, ActionListener {
     @Override
     public int getCurrentTime() {
         return currentTime;
+    }
+
+    @Override
+    public void stopTime() {
+       clockTimer.stop();
     }
 
     @Override

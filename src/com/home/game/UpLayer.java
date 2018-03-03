@@ -7,8 +7,10 @@ public interface UpLayer {
 
     public void setMark(int y, int x);
     public int[][] getMarkInfo();
+    public int getNumberMarksFlag();
 
     public boolean[][] getDataLayer();
+    public int getNumberCloseCell();
     public boolean isBomb();
     public void takeOffBomb();
     public void setBomb();
