@@ -80,6 +80,8 @@ public class GroundLayer implements UpLayer {
     @Override
     public void openCell(int y, int x) {
         if(innerMarkArr[y][x]!=1) {
+            this.innerDataArr[y][x] = true;
+
             if (dataField[y][x] < 0) {
                 setBomb();
             }
@@ -90,14 +92,11 @@ public class GroundLayer implements UpLayer {
                 checkRight(y, x);
                 checkLeft(y, x);
             }
-
-            this.innerDataArr[y][x] = true;
-
             for (int i = 0; i < innerDataArr.length; i++) {
                 for (int j = 0; j < innerDataArr[i].length; j++) {
-                    if (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                            fieldCheckedRight[i][j]||fieldCheckedLeft[i][j]) {
-                        innerDataArr[i][j] = true;
+                    if(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                            fieldCheckedRight[i][j]||fieldCheckedLeft[i][j]){
+                        innerDataArr[i][j]=true;
                     }
                 }
             }
@@ -111,122 +110,168 @@ public class GroundLayer implements UpLayer {
                         /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
                          fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
                         innerDataArr[i][j]) {
-                    if(innerMarkArr[i + 1][j + 1]!=1) this.innerDataArr[i + 1][j + 1] = true;
-                    if(innerMarkArr[i - 1][j - 1]!=1) this.innerDataArr[i - 1][j - 1] = true;
-                    if(innerMarkArr[i - 1][j + 1]!=1) this.innerDataArr[i - 1][j + 1] = true;
-                    if(innerMarkArr[i + 1][j - 1]!=1) this.innerDataArr[i + 1][j - 1] = true;
+
+                    //диагональ вниз-вправо для флагов
+                    /*if(dataField[i+1][j+1]==0&&innerMarkArr[i][j+1]==1&&innerMarkArr[i+1][j]==1&&
+                            !innerDataArr[i+1][j+1]){
+                        openCell(i+1,j+1);
+                    }*/
+                    //диагональ вниз-влево для флагов
+                    /*if(dataField[i-1][j-1]==0&&innerMarkArr[i][j-1]==1&&innerMarkArr[i-1][j]==1&&
+                            !innerDataArr[i-1][j-1]){
+                        openCell(i-1,j-1);
+                    }*/
+                    //диагональ вверх-вправо для флагов
+                    /*if(dataField[i-1][j+1]==0&&innerMarkArr[i][j+1]==1&&innerMarkArr[i-1][j]==1&&
+                            !innerDataArr[i-1][j+1]){
+                        openCell(i-1,j+1);
+                    }*/
+                    //диагональ вверх-влево
+                    /*if(dataField[i+1][j-1]==0&&innerMarkArr[i][j-1]==1&&innerMarkArr[i+1][j]==1&&
+                            !innerDataArr[i+1][j-1]){
+                        openCell(i+1,j-1);
+                    }*/
 
                     //диагональ вниз-вправо
                     if(dataField[i+1][j+1]==0&&
-                            (dataField[i][j+1]>0/*||innerMarkArr[i][j+1]==1*/) &&
-                            (dataField[i+1][j]>0/*||innerMarkArr[i+1][j]==1*/)&&
+                            (dataField[i][j+1]>0||innerMarkArr[i][j+1]==1) &&
+                            (dataField[i+1][j]>0||innerMarkArr[i+1][j]==1)&&
                             !innerDataArr[i+1][j+1]/*&&
                             (!fieldCheckedUp[i+1][j+1]   || !fieldCheckedDown[i+1][j+1] ||
                              !fieldCheckedLeft[i+1][j+1] || !fieldCheckedRight[i+1][j+1])*/
                             ){
                         openCell(i+1,j+1);
                     }
-                    if(dataField[i+1][j+1]==0&&innerMarkArr[i][j+1]==1&&innerMarkArr[i+1][j]==1&&
-                            !innerDataArr[i+1][j+1]){
-                        openCell(i+1,j+1);
-                    }
+
                     //диагональ вверх-влево
                     if(dataField[i-1][j-1]==0&&
-                            (dataField[i][j-1]>0) &&
-                            (dataField[i-1][j]>0) &&
+                            (dataField[i][j-1]>0||innerMarkArr[i][j-1]==1) &&
+                            (dataField[i-1][j]>0||innerMarkArr[i-1][j]==1) &&
                             !innerDataArr[i-1][j-1]/*&&
                             (!fieldCheckedUp[i-1][j-1]   || !fieldCheckedDown[i-1][j-1] ||
                              !fieldCheckedLeft[i-1][j-1] || !fieldCheckedRight[i-1][j-1])*/) {
                         openCell(i-1,j-1);
                     }
-                    if(dataField[i-1][j-1]==0&&innerMarkArr[i][j-1]==1&&innerMarkArr[i-1][j]==1&&
-                            !innerDataArr[i-1][j-1]){
-                        openCell(i-1,j-1);
-                    }
 
                     //диагональ вверх-вправо
                     if(dataField[i-1][j+1]==0&&
-                            (dataField[i][j+1]>0) &&
-                            (dataField[i-1][j]>0) &&
+                            (dataField[i][j+1]>0||innerMarkArr[i][j+1]==1) &&
+                            (dataField[i-1][j]>0||innerMarkArr[i-1][j]==1) &&
                             !innerDataArr[i-1][j+1]/*&&
                             (!fieldCheckedUp[i-1][j+1]   || !fieldCheckedDown[i-1][j+1] ||
                              !fieldCheckedLeft[i-1][j+1] || !fieldCheckedRight[i-1][j+1])*/) {
                         openCell(i-1,j+1);
                     }
-                    if(dataField[i-1][j+1]==0&&innerMarkArr[i][j+1]==1&&innerMarkArr[i-1][j]==1&&
-                            !innerDataArr[i-1][j+1]){
-                        openCell(i-1,j+1);
-                    }
+
 
                     //диагональ вниз-влево
                     if(dataField[i+1][j-1]==0&&
                             (dataField[i][j-1]>0||innerMarkArr[i][j-1]==1) &&
                             (dataField[i+1][j]>0||innerMarkArr[i+1][j]==1) &&
-                            !innerDataArr[i+1][j-1]/*&&
-                            (!fieldCheckedUp[i+1][j-1]   || !fieldCheckedDown[i+1][j-1] ||
+                            !innerDataArr[i+1][j-1]
+                            /*(!fieldCheckedUp[i+1][j-1]   || !fieldCheckedDown[i+1][j-1] ||
                              !fieldCheckedLeft[i+1][j-1] || !fieldCheckedRight[i+1][j-1])*/) {
                         openCell(i+1,j-1);
                     }
-                    if(dataField[i+1][j-1]==0&&innerMarkArr[i][j-1]==1&&innerMarkArr[i+1][j]==1&&
-                            !innerDataArr[i+1][j-1]){
-                        openCell(i+1,j-1);
-                    }
+
+                    if(innerMarkArr[i + 1][j + 1]!=1) this.innerDataArr[i + 1][j + 1] = true;
+                    if(innerMarkArr[i - 1][j - 1]!=1) this.innerDataArr[i - 1][j - 1] = true;
+                    if(innerMarkArr[i - 1][j + 1]!=1) this.innerDataArr[i - 1][j + 1] = true;
+                    if(innerMarkArr[i + 1][j - 1]!=1) this.innerDataArr[i + 1][j - 1] = true;
+
                 }
                 //обход верха
                 else if(dataField[i][j]==0&&i==0&&j>0&&
                         j<dataField[i].length-1&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])){
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]){
+                    //снизу: открыть ячейки справа-слева
                     if(innerMarkArr[i + 1][j + 1]!=1) this.innerDataArr[i + 1][j + 1] = true;
                     if(innerMarkArr[i + 1][j - 1]!=1) this.innerDataArr[i + 1][j - 1] = true;
 
+                    //если ячейка справа-внизу пустая и неоткрыта
+                    // и справа содержит цифру
+                    // и снизу содержит цифру
+                    //войти по диагонали справа-вниз и исследовать
                     if(dataField[i+1][j+1]==0&&dataField[i][j+1]>0&&dataField[i+1][j]>0&&
-                            (!fieldCheckedUp[i+1][j+1]   || !fieldCheckedDown[i+1][j+1] ||
-                             !fieldCheckedLeft[i+1][j+1] || !fieldCheckedRight[i+1][j+1])) {
+                            /*(!fieldCheckedUp[i+1][j+1]   || !fieldCheckedDown[i+1][j+1] ||
+                             !fieldCheckedLeft[i+1][j+1] || !fieldCheckedRight[i+1][j+1])*/
+                            !innerDataArr[i+1][j+1]) {
                         openCell(i+1,j+1);
                     }
+                    //если ячейка слева-внизу пустая и неоткрыта
+                    // и справа содержит цифру
+                    // и снизу содержит цифру
+                    //войти по диагонали слева-вниз и исследовать
                     if(dataField[i+1][j-1]==0&&dataField[i][j-1]>0&&dataField[i+1][j]>0&&
-                            (!fieldCheckedUp[i+1][j-1]   || !fieldCheckedDown[i+1][j-1] ||
-                             !fieldCheckedLeft[i+1][j-1] || !fieldCheckedRight[i+1][j-1])) {
+                            /*(!fieldCheckedUp[i+1][j-1]   || !fieldCheckedDown[i+1][j-1] ||
+                             !fieldCheckedLeft[i+1][j-1] || !fieldCheckedRight[i+1][j-1])*/
+                            !innerDataArr[i+1][j-1]) {
                         openCell(i+1,j-1);
                     }
                 }
                 //обход низа
                 else if(dataField[i][j]==0&&i==dataField.length-1&&
                         j>0&&j<dataField[i].length-1&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])){
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]){
+                    //открыть сверху-справа и сверху-слева ячейки, елси они не блокированы флагами
                     if(innerMarkArr[i - 1][j - 1]!=1) this.innerDataArr[i - 1][j - 1] = true;
                     if(innerMarkArr[i - 1][j + 1]!=1) this.innerDataArr[i - 1][j + 1] = true;
 
+                    //если ячейка сверху-слева пустая и закрыта
+                    //и ячейка слева содержит цифру
+                    //и ячейка сверху содержит цифру
+                    //исследовать ячейку сверху-слева
                     if(dataField[i-1][j-1]==0&&dataField[i][j-1]>0&&dataField[i-1][j]>0&&
-                            (!fieldCheckedUp[i-1][j-1]   || !fieldCheckedDown[i-1][j-1] ||
-                             !fieldCheckedLeft[i-1][j-1] || !fieldCheckedRight[i-1][j-1])) {
+                            /*(!fieldCheckedUp[i-1][j-1]   || !fieldCheckedDown[i-1][j-1] ||
+                             !fieldCheckedLeft[i-1][j-1] || !fieldCheckedRight[i-1][j-1])*/
+                            !innerDataArr[i-1][j-1]) {
                         openCell(i-1,j-1);
                     }
 
+                    //если ячейка сверху-справа пустая и закрыта
+                    //и ячейка справа содержит цифру
+                    //и ячейка сверху содержит цифру
+                    //исследовать ячейку сверху-справа
                     if(dataField[i-1][j+1]==0&&dataField[i][j+1]>0&&dataField[i-1][j]>0&&
-                            (!fieldCheckedUp[i-1][j+1]   || !fieldCheckedDown[i-1][j+1] ||
-                             !fieldCheckedLeft[i-1][j+1] || !fieldCheckedRight[i-1][j+1])) {
+                            /*(!fieldCheckedUp[i-1][j+1]   || !fieldCheckedDown[i-1][j+1] ||
+                             !fieldCheckedLeft[i-1][j+1] || !fieldCheckedRight[i-1][j+1])*/
+                            !innerDataArr[i-1][j+1]) {
                         openCell(i-1,j+1);
                     }
                 }
+
                 //обход левой границы
                 else if(dataField[i][j]==0&&i>0&&j==0&&
                         i<dataField.length-1&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])) {
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]) {
+                    //открыть справа-сверху и справа-снизу ячейки
                     if(innerMarkArr[i + 1][j + 1]!=1) this.innerDataArr[i + 1][j + 1] = true;
                     if(innerMarkArr[i - 1][j + 1]!=1) this.innerDataArr[i - 1][j + 1] = true;
 
+                    //если ячейка справа-сверху пустая и закрыта
+                    //и ячейка справа содержит цифру
+                    //и ячейка сверху содержит цифру
+                    //исследовать ячейку справа-сверху
                     if (dataField[i + 1][j + 1] == 0 && dataField[i][j + 1] > 0 && dataField[i + 1][j] > 0 &&
-                            (!fieldCheckedUp[i + 1][j + 1] || !fieldCheckedDown[i + 1][j + 1] ||
-                             !fieldCheckedLeft[i + 1][j + 1] || !fieldCheckedRight[i + 1][j + 1])) {
+                            /*(!fieldCheckedUp[i + 1][j + 1] || !fieldCheckedDown[i + 1][j + 1] ||
+                            !fieldCheckedLeft[i + 1][j + 1] || !fieldCheckedRight[i + 1][j + 1])*/
+                            !innerDataArr[i + 1][j + 1]) {
                         openCell(i + 1, j + 1);
                     }
+                    //если ячейка справа-снизу пустая и закрыта
+                    //и ячейка справа содержит цифру
+                    //и ячейка снизу содержит цифру
+                    //исследовать ячейку справа-снизу
                     if (dataField[i - 1][j + 1] == 0 && dataField[i][j + 1] > 0 && dataField[i - 1][j] > 0 &&
-                            (!fieldCheckedUp[i - 1][j + 1] || !fieldCheckedDown[i - 1][j + 1] ||
-                             !fieldCheckedLeft[i - 1][j + 1] || !fieldCheckedRight[i - 1][j + 1])) {
+                            /*(!fieldCheckedUp[i - 1][j + 1] || !fieldCheckedDown[i - 1][j + 1] ||
+                             !fieldCheckedLeft[i - 1][j + 1] || !fieldCheckedRight[i - 1][j + 1])*/
+                            !innerDataArr[i - 1][j + 1]) {
                         openCell(i - 1, j + 1);
                     }
                 }
@@ -235,13 +280,21 @@ public class GroundLayer implements UpLayer {
                 else if(dataField[i][j]==0&&i>0&&
                         i<dataField.length-1&&
                         j==dataField[i].length-1&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])) {
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]) {
+                    //открыть ячейки слева-сверху и слева-снизу
                     if(innerMarkArr[i - 1][j - 1]!=1) this.innerDataArr[i - 1][j - 1] = true;
                     if(innerMarkArr[i + 1][j - 1]!=1) this.innerDataArr[i + 1][j - 1] = true;
+
+                    //если ячейка слева-снизу пустая и закрыта
+                    //и ячейка слева содержит цифру
+                    //и ячейка снизу содержит цифру
+                    //исследовать ячейку слева-снизу
                     if (dataField[i - 1][j - 1] == 0 && dataField[i][j - 1] > 0 && dataField[i - 1][j] > 0 &&
-                            (!fieldCheckedUp[i - 1][j - 1] || !fieldCheckedDown[i - 1][j - 1] ||
-                             !fieldCheckedLeft[i - 1][j - 1] || !fieldCheckedRight[i - 1][j - 1])) {
+                            /*(!fieldCheckedUp[i - 1][j - 1] || !fieldCheckedDown[i - 1][j - 1] ||
+                             !fieldCheckedLeft[i - 1][j - 1] || !fieldCheckedRight[i - 1][j - 1])*/
+                            !innerDataArr[i - 1][j - 1]) {
                         openCell(i - 1, j - 1);
                     }
                     if (dataField[i + 1][j - 1] == 0 && dataField[i][j - 1] > 0 && dataField[i + 1][j] > 0 &&
@@ -250,53 +303,83 @@ public class GroundLayer implements UpLayer {
                         openCell(i + 1, j - 1);
                     }
                 }
+
                 //проверка левого верхнего угла
                 else if(dataField[i][j]==0&&i==0&&j==0&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])) {
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]) {
+                    //открыть ячейку снизу-справа, если та не содержит флага
                     if(innerMarkArr[i + 1][j + 1]!=1) this.innerDataArr[i + 1][j + 1] = true;
 
+                    //если ячейка снизу-справа пустая и закрыта
+                    //и ячейка справа содержит цифру
+                    //и ячейка снизу содержит цифру
+                    //исследовать ячейку снизу-справа
                     if (dataField[i + 1][j + 1] == 0 && dataField[i][j + 1] > 0 && dataField[i + 1][j] > 0 &&
-                            (!fieldCheckedUp[i + 1][j + 1] || !fieldCheckedDown[i + 1][j + 1] ||
-                             !fieldCheckedLeft[i + 1][j + 1] || !fieldCheckedRight[i + 1][j + 1])) {
+                            /*(!fieldCheckedUp[i + 1][j + 1] || !fieldCheckedDown[i + 1][j + 1] ||
+                            !fieldCheckedLeft[i + 1][j + 1] || !fieldCheckedRight[i + 1][j + 1])*/
+                            !innerDataArr[i + 1][j + 1]) {
                         openCell(i + 1, j + 1);
                     }
                 }
+
                 //проверка правого верхнего угла
                 else if(dataField[i][j]==0&&i==0&&
                         j==dataField[i].length-1&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])) {
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]) {
+                    //открыть ячейку снизу-слева, если та не содержит флага
                     if(innerMarkArr[i + 1][j - 1]!=1) this.innerDataArr[i + 1][j - 1] = true;
 
+                    //если ячейка снизу-слева пустая и закрыта
+                    //и ячейка слева содержит цифру
+                    //и ячейка снизу содержит цифру
+                    //исследовать ячейку снизу-слева
                     if (dataField[i + 1][j - 1] == 0 && dataField[i][j - 1] > 0 && dataField[i + 1][j] > 0 &&
-                            (!fieldCheckedUp[i + 1][j - 1] || !fieldCheckedDown[i + 1][j - 1] ||
-                             !fieldCheckedLeft[i + 1][j - 1] || !fieldCheckedRight[i + 1][j - 1])) {
+                            /*(!fieldCheckedUp[i + 1][j - 1] || !fieldCheckedDown[i + 1][j - 1] ||
+                             !fieldCheckedLeft[i + 1][j - 1] || !fieldCheckedRight[i + 1][j - 1])*/
+                            !innerDataArr[i + 1][j - 1]) {
                         openCell(i + 1, j - 1);
                     }
                 }
                 //проверка левого нижнего угла
                 else if(dataField[i][j]==0&&i==dataField.length-1&&j==0&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])) {
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]) {
+                    //открыть ячейку сверху-справа, если та не содержит флага
                     if(innerMarkArr[i - 1][j + 1]!=1) this.innerDataArr[i - 1][j + 1] = true;
 
+                    //если ячейка сверху-справа пустая и закрыта
+                    //и ячейка справа содержит цифру
+                    //и ячейка сверху содержит цифру
+                    //исследовать ячейку сверху-справа
                     if (dataField[i - 1][j + 1] == 0 && dataField[i][j + 1] > 0 && dataField[i - 1][j] > 0 &&
-                            (!fieldCheckedUp[i - 1][j + 1] || !fieldCheckedDown[i - 1][j + 1] ||
-                             !fieldCheckedLeft[i - 1][j + 1] || !fieldCheckedRight[i - 1][j + 1])) {
+                            /*(!fieldCheckedUp[i - 1][j + 1] || !fieldCheckedDown[i - 1][j + 1] ||
+                             !fieldCheckedLeft[i - 1][j + 1] || !fieldCheckedRight[i - 1][j + 1])*/
+                            !innerDataArr[i - 1][j + 1]) {
                         openCell(i - 1, j + 1);
                     }
                 }
                 //проверка правого нижнего угла
                 else if(dataField[i][j]==0&&i==dataField.length-1&&
                         j==dataField[i].length-1&&
-                        (fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
-                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])) {
+                        /*(fieldCheckedUp[i][j]||fieldCheckedDown[i][j]||
+                         fieldCheckedRight[i][j]||fieldCheckedLeft[i][j])*/
+                        innerDataArr[i][j]) {
+                    //открыть ячейку сверху-слева, если та не содержит флага
                     if(innerMarkArr[i - 1][j - 1]!=1) this.innerDataArr[i - 1][j - 1] = true;
 
+                    //если ячейка сверху-слева пустая и закрыта
+                    //и ячейка слева содержит цифру
+                    //и ячейка сверху содержит цифру
+                    //исследовать ячейку сверху-слева
                     if (dataField[i - 1][j - 1] == 0 && dataField[i][j - 1] > 0 && dataField[i - 1][j] > 0 &&
-                            (!fieldCheckedUp[i - 1][j - 1] || !fieldCheckedDown[i - 1][j - 1] ||
-                             !fieldCheckedLeft[i - 1][j - 1] || !fieldCheckedRight[i - 1][j - 1])) {
+                            /*(!fieldCheckedUp[i - 1][j - 1] || !fieldCheckedDown[i - 1][j - 1] ||
+                             !fieldCheckedLeft[i - 1][j - 1] || !fieldCheckedRight[i - 1][j - 1])*/
+                            !innerDataArr[i - 1][j - 1]) {
                         openCell(i - 1, j - 1);
                     }
                 }
@@ -314,8 +397,8 @@ public class GroundLayer implements UpLayer {
 
     @Override
     public void setMark(int y, int x) {
-        if(innerDataArr[y][x]==false&&innerMarkArr[y][x]==0) innerMarkArr[y][x] = 1;
-        else if(innerDataArr[y][x]==false&&innerMarkArr[y][x]==1) innerMarkArr[y][x] = 2;
+        if(!innerDataArr[y][x]&&innerMarkArr[y][x]==0) innerMarkArr[y][x] = 1;
+        else if(!innerDataArr[y][x]&&innerMarkArr[y][x]==1) innerMarkArr[y][x] = 2;
         else innerMarkArr[y][x] = 0;
     }
 

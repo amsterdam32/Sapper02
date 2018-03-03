@@ -36,7 +36,7 @@ public class FieldModel implements FieldModelInterface, ActionListener {
     private boolean gameIsStart = false;
 
     public FieldModel(){
-        this(20,20,10);
+        this(20,20,40);
     }
 
     public FieldModel(int height, int width, int numberBombs) {
@@ -93,7 +93,7 @@ public class FieldModel implements FieldModelInterface, ActionListener {
         notifyObservers();
     }
 
-    public void startClock(){
+    private void startClock(){
         if(clockTimer==null){
             currentTime=0;
             clockTimer = new Timer(100, this);

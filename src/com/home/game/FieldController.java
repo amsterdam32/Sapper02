@@ -7,7 +7,7 @@ public class FieldController {
     private FieldModel fieldModel;
     private FieldView fieldView;
 
-    public FieldController(){
+    FieldController(){
         fieldModel = new FieldModel();
         fieldView = new FieldView(this, fieldModel);
         fieldView.createView();
@@ -30,7 +30,7 @@ public class FieldController {
         fieldModel.setBrightCell(y,x);
     }
     public void newGame(){
-        newGame(9,9,10);
+        newGame(20,20,40);
     }
 
     public void newGame(int height, int width, int numbersBombs){

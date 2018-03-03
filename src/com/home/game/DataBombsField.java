@@ -21,6 +21,7 @@ public class DataBombsField implements InfoBombsField {
     @Override
     public void setBombs(int numberBombs) {
         Date seed = new Date();
+        //Date seed = new Date(2018, 02, 14);
         Random number = new Random(seed.getTime());
         sequenceBombs = new HashSet<Integer>();
         while (sequenceBombs.size() < numberBombs) {
