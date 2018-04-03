@@ -9,305 +9,523 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class FieldModel implements FieldModelInterface, ActionListener {
-    private int height;
-    private int width;
-    private int numberBombs;
-    private final int CELLSIZE = 40;
+/**
+ * The <code>FieldModel</code> class that describe information model of game field,
+ * and includes all information about game field state
+ * and various methods for manipulating this.
+ */
+public class FieldModel implements Observable, ActionListener {
+    /**
+     * Container for each observers that registers.
+     */
+    private ArrayList<Observer> observers;
+    /**
+     * Value of rows in the game field.
+     */
+    private int rowsInField;
+    /**
+     * Value of columns in the game field.
+     */
+    private int colsInField;
+    /**
+     * Value of quantity bombs on the game field.
+     */
+    private int quantityBombs;
+    /**
+     * Size side of square what represents of the game field cell.
+     */
+    private final int CELL_SIZE = 40;
 
-    private InfoBombsField infoField;
-    private UpLayer groundLayer;
-    private ImagePuzzleInterface underGroudImagePuzzle;
-    private ImagePuzzleInterface groundImagePuzzle;
-    private ImagePuzzleInterface groundLightImagePuzzle;
-    private AnimateLayer explosionLayer;
+    /**
+     * The flag indicates success upload all images.
+     */
+    private boolean fieldWithImages = true;
 
-    private ArrayList<FieldObserver> fieldObservers;
+    /**
+     * Object store data about contents of cells
+     */
+    private ContentsOfCells contentsOfCells;
+    /**
+     * Object store information about states surface of cells
+     */
+    private StateSurfaceOfCells stateSurfaceOfCells;
+    /**
+     * Object for handling for animations explosion.
+     */
+    private Animate animateExplosion;
+    /**
+     * Object for handling for image underground layer of game field.
+     */
+    private TilesOfImage tilesOfUndergroundImg;
+    /**
+     * Object for handling for image surface of game field.
+     */
+    private TilesOfImage tilesOfSurfaceImg;
+    /**
+     * Object for handling for alternatives image surface of game field.
+     */
+    private TilesOfImage tilesOfLightSurfaceImg;
 
+    /**
+     * Flag for indicate event about explosion.
+     */
     private boolean wasExplosion = false;
+    /**
+     * Flag for indicate the bomb was found.
+     */
     private boolean findBomb = false;
-    private BufferedImage frame = null;
 
+    /**
+     * Container for image mark of flag.
+     */
     private BufferedImage flagImg = null;
+    /**
+     * Container for image mark of question.
+     */
     private BufferedImage questionImg = null;
+    /**
+     * Container for image of bomb.
+     */
     private BufferedImage bombImg = null;
-    private BufferedImage groundImg = null;
-    private BufferedImage groundLightImg = null;
-    private BufferedImage underGroundImg = null;
-    private int underGroundImageScale;
-    private int groundImageScale;
+    /**
+     * Container for image surface of game field.
+     */
+    private BufferedImage surfaceImg = null;
+    /**
+     * Container for alternative a image surface of game field.
+     */
+    private BufferedImage lightSurfaceImg = null;
+    /**
+     * Container for image underground layer of game field.
+     */
+    private BufferedImage undergroundImg = null;
+    /**
+     * value of scale for underground image
+     */
+    private int undergroundImgScale;
+    /**
+     * value of scale for surface image
+     */
+    private int surfaceImgScale;
 
+    /**
+     * Timer for counting time between frames with animation explosion.
+     */
     private Timer explosionTimer;
+    /**
+     * Value delay between frames with animation explosion.
+     */
+    private int explosionFrameDelay = 63;
+    /**
+     * Timer for counting game time.
+     */
     private Timer clockTimer;
+    /**
+     * Value step game time.
+     */
+    private final int CLOCK_TIMER_DELAY = 100;
+    /**
+     * Current value game time.
+     */
     private int currentTime;
 
+    /**
+     * Flag for indicate event about starts game.
+     */
     private boolean gameIsStart = false;
+    /**
+     * Flag for indicate event about ends game.
+     */
     private boolean gameIsEnd = false;
 
-    public FieldModel(){
-        this(9,9,10);
-    }
+    public FieldModel(int rowsInField, int colsInField, int quantityBombs) {
+        this.colsInField = colsInField;
+        this.rowsInField = rowsInField;
+        this.quantityBombs = quantityBombs;
 
-    public FieldModel(int height, int width, int numberBombs) {
-        this.width = width;
-        this.height = height;
-        this.numberBombs = numberBombs;
-        infoField = new DataBombsField(height, width);
-        infoField.setBombs(numberBombs);
-        groundLayer = new GroundLayer(height,width, infoField.getInfoFields());
-        fieldObservers = new ArrayList<FieldObserver>();
+        contentsOfCells = new ContentsOfCellsGame(rowsInField, colsInField);
+        contentsOfCells.setBombs(quantityBombs);
+        contentsOfCells.calculateContentsOfCells();
+
+        stateSurfaceOfCells = new StateSurfaceOfCellsGame(rowsInField, colsInField, contentsOfCells.getContentsOfCells());
+        observers = new ArrayList();
         startClock();
-
     }
 
-    @Override
-    public void loadImg() {
-        try {
-            explosionLayer = new AnimateExplosionLayer(ImageIO.read(new File("pic/explosionSprite512_512.png")));
-            bombImg = ImageIO.read(new File("pic/bomb40_40.png"));
-            flagImg = ImageIO.read(new File("pic/flag40_40.png"));
-            questionImg = ImageIO.read(new File("pic/questionMark40_40.png"));
-            underGroundImg = ImageIO.read(new File("pic/ground600_600.jpg"));
-            groundImg = ImageIO.read(new File("pic/grass600_600.jpg"));
-            groundLightImg = ImageIO.read(new File("pic/grassLight600_600.jpg"));
-            groundImagePuzzle = new ImagePuzzle(groundImg, getGroundImageScale());
-            groundLightImagePuzzle = new ImagePuzzle(groundLightImg, getGroundImageScale());
-            underGroudImagePuzzle = new ImagePuzzle(underGroundImg, getUnderGroundImageScale());
+    /**
+     * Method for upload images for all objects game.
+     * @throws IOException
+     */
+    public void loadImg() throws IOException {
+            try {
+                animateExplosion = new AnimateExplosion(ImageIO.read(new File("src/images/explosionSprite512_512.png")), 4, 4);
+                bombImg = ImageIO.read(new File("src/images/bomb40_40.png"));
+                flagImg = ImageIO.read(new File("src/images/flag40_40.png"));
+                questionImg = ImageIO.read(new File("src/images/questionMark40_40.png"));
+                undergroundImg = ImageIO.read(new File("src/images/ground600_600.jpg"));
+                surfaceImg = ImageIO.read(new File("src/images/grass600_600.jpg"));
+                lightSurfaceImg = ImageIO.read(new File("src/images/grassLight600_600.jpg"));
+                tilesOfSurfaceImg = new TilesOfImageObjectsGame(surfaceImg, rowsInField, colsInField, getSurfaceImgScale());
+                tilesOfLightSurfaceImg = new TilesOfImageObjectsGame(lightSurfaceImg, rowsInField, colsInField, getSurfaceImgScale());
+                tilesOfUndergroundImg = new TilesOfImageObjectsGame(undergroundImg, rowsInField, colsInField, getUndergroundImgScale());
+            }
+            catch (IOException e) {
+                fieldWithImages = false;
+                throw new IOException();
+            }
+    }
 
-        } catch (IOException e) {
-            explosionLayer = null;
+    /**
+     * Method indicates about successfulness or not for uploading images.
+     * @return boolean value true - success, false - no
+     */
+    public boolean getLoadImagesState(){
+        return fieldWithImages;
+    }
+
+    /**
+     * Method return array data about contents of cells
+     * @return - digitals from 1 to 8 indicate neighbourhood with bombs
+     *         <br> - 0 is empty cells</br>
+     *         <br> - all negative digital indicate on bomb</br>
+     */
+    public int[][] getContentsOfCells() {
+        return contentsOfCells.getContentsOfCells();
+    }
+
+    /**
+     * Method return array data with information about states surface of cells
+     * @return       - true - opened
+     *          <br> - false - closed</br>
+     */
+    public boolean[][] getCellsSurfaceState() {
+        return stateSurfaceOfCells.getCellsSurfaceState();
+    }
+
+    /**
+     * Method returns array of images surface for each cells of game field.
+     */
+    public BufferedImage[][] getTilesOfSurfaceImg() {
+        return tilesOfSurfaceImg.getTilesOfImg();
+    }
+
+    /**
+     * Method returns array of alternatives images surface for each cells of game field.
+     */
+    public BufferedImage[][] getTilesOfLightSurfaceImg() {
+        return tilesOfLightSurfaceImg.getTilesOfImg();
+    }
+
+    /**
+     * Method returns array of images underground layer of game field under each cells.
+     */
+    public BufferedImage[][] getTilesOfUndergroundImg() {
+        return tilesOfUndergroundImg.getTilesOfImg();
+    }
+
+    /**
+     * Method gets value of scale for surface image
+     */
+    public int getSurfaceImgScale() {
+        return surfaceImgScale;
+    }
+
+    /**
+     * Method sets value of scale for surface image
+     * @param scale
+     */
+    public void setSurfaceImgScale(int scale) {
+        this.surfaceImgScale = scale;
+    }
+    /**
+     * Method gets value of scale for underground image
+     */
+    public int getUndergroundImgScale() {
+        return undergroundImgScale;
+    }
+    /**
+     * Method sets value of scale for underground image
+     * @param scale
+     */
+    public void setUndergroundIgmScale(int scale) {
+        this.undergroundImgScale = scale;
+    }
+
+    /**
+     * The method is used for setting mark on surface selected cell.
+     * @param row - new value of row where placed cell
+     * @param col - new value of column where placed cell
+     */
+    public void setMark(int row, int col) {
+        stateSurfaceOfCells.setMark(row,col);
+        notifyObserversData();
+    }
+
+    /**
+     * Method return data array contains information about marks
+     * that was sets on surface of cells.
+     * @return      - 0 equal cell without marks
+     *         <br> - 1 equal mark of flag</br>
+     *         <br> - 2 equal mark of question</br>
+     */
+    public int[][] getDataOfMarks() {
+        return stateSurfaceOfCells.getDataOfMarks();
+    }
+
+    /**
+     * Method returns quantity marks of flag that sets on game field
+     * relative total value of bombs if it more > -99
+     */
+    public int getQuantityMarkedBombs() {
+        if(getQuantityBombs() - stateSurfaceOfCells.getQuantityFlagMarks() > -100)
+            return getQuantityBombs() - stateSurfaceOfCells.getQuantityFlagMarks();
+        else return -99;
+    }
+
+    /**
+     * Method return boolean value about winning.
+     */
+    public boolean checkGameStateWin() {
+        if (stateSurfaceOfCells.getQuantityCloseCells() == getQuantityBombs() &&
+                !wasExplosion && !gameIsEnd) {
+            return true;
+        } else {
+            return false;
         }
     }
 
-    @Override
-    public int[][] getInfoBottomLayer() {
-        return infoField.getInfoFields();
-    }
-
-    @Override
-    public boolean[][] getInfoUpLayer() {
-        return groundLayer.getDataLayer();
-    }
-
-    @Override
-    public BufferedImage[][] getGroundImagePuzzle() {
-        return groundImagePuzzle.getImagePuzzle();
-    }
-
-    @Override
-    public BufferedImage[][] getGroundLightImagePuzzle() {
-        return groundLightImagePuzzle.getImagePuzzle();
-    }
-
-    @Override
-    public BufferedImage[][] getUnderGroundImagePuzzle() {
-        return underGroudImagePuzzle.getImagePuzzle();
-    }
-
-    @Override
-    public int getGroundImageScale() {
-        return groundImageScale;
-    }
-
-    @Override
-    public void setGroundImageScale(int scale) {
-        this.groundImageScale = scale;
-    }
-
-    @Override
-    public int getUnderGroundImageScale() {
-        return underGroundImageScale;
-    }
-
-    @Override
-    public void setUnderGroundImageScale(int scale) {
-        this.underGroundImageScale = scale;
-    }
-
-    @Override
-    public void setMark(int y, int x) {
-        groundLayer.setMark(y,x);
-        notifyObservers();
-    }
-
-    @Override
-    public int[][] getMarkInfo() {
-        return groundLayer.getMarkInfo();
-    }
-
-    @Override
-    public int getNumberMarksFlag() {
-        return getNumberBombs() - groundLayer.getNumberMarksFlag();
-    }
-
-    @Override
-    public boolean checkGameStateWin() {
-        if(groundLayer.getNumberCloseCell()==getNumberBombs()&&
-                !wasExplosion&&!gameIsEnd) return true;
-        else return false;
-    }
-
-    @Override
+    /**
+     * Method sets state about end of game.
+     * @param state
+     */
     public void setGameIsEnd(boolean state) {
         gameIsEnd = state;
     }
 
-    @Override
-    public void openCell(int y, int x) {
+    /**
+     * The method is used to open a field cell in the transmitted coordinates and
+     * reaction on possible event linked with this.
+     * @param row - new value of row where placed cell
+     * @param col - new value of col where placed cell
+     */
+    public void openCell(int row, int col) {
         gameIsStart = true;
-        if (!groundLayer.getDataLayer()[y][x]&&groundLayer.getMarkInfo()[y][x]!=1) {
-            groundLayer.openCell(y,x);
-            if(groundLayer.isBomb()) {
+        if (stateSurfaceOfCells.getCellsSurfaceState()[row][col] == State.CLOSED.getValue()&&
+                stateSurfaceOfCells.getDataOfMarks()[row][col]!=Mark.FLAG.getValue()) {
+            stateSurfaceOfCells.openCell(row,col);
+            if(stateSurfaceOfCells.isBomb()) {
                 wasExplosion = true;
-                startExplosion(x, y);
-                groundLayer.takeOffBomb();
+                if(fieldWithImages)startExplosion(row, col);
+                else setBombFoundState(true);
+                stateSurfaceOfCells.takeOffBomb();
             }
         }
-        notifyObservers();
+        notifyObserversData();
     }
 
+    /**
+     * Start game timer.
+     */
     private void startClock(){
         if(clockTimer==null){
             currentTime=0;
-            clockTimer = new Timer(100, this);
+            clockTimer = new Timer(CLOCK_TIMER_DELAY, this);
             clockTimer.start();
         }
-
     }
 
-    @Override
-    public void setBrightCell(int y, int x) {
-        groundLayer.setBrightCell(y, x);
+    /**
+     * Method sets coordinate for cell on game field with alternative state of surface.
+     * @param row - new value of row where placed cell
+     * @param col - new value of col where placed cell
+     */
+    public void setBrightCell(int row, int col) {
+        stateSurfaceOfCells.setBrightCell(row, col);
     }
 
-    @Override
-    public int[] getBrightCell() {
-        return groundLayer.getBrightCell();
+    /**
+     * Method gets value of column where placed cell with alternative state.
+     */
+    public int getBrightCellCol() {
+        return stateSurfaceOfCells.getBrightCellCol();
     }
 
-    @Override
-    public int getHeight() {
-        return height;
-    }
-    @Override
-    public int getWidth() {
-        return width;
+    /**
+     * Method gets value of row where placed cell with alternative state.
+     */
+    public int getBrightCellRow() {
+        return stateSurfaceOfCells.getBrightCellRow();
     }
 
-    @Override
-    public int getNumberBombs() {
-        return numberBombs;
+    /**
+     * Method gets value of columns in game field.
+     */
+    public int getColsInField() {
+        return colsInField;
     }
 
-    @Override
+    /**
+     * Method gets value of rows in game field.
+     */
+    public int getRowsInField() {
+        return rowsInField;
+    }
+
+    /**
+     * Method gets value of quantity bombs on game field.
+     */
+    public int getQuantityBombs() {
+        return quantityBombs;
+    }
+
+    /**
+     * Method gets value of size of cell for game field.
+     */
     public int getCellSize() {
-        return CELLSIZE;
+        return CELL_SIZE;
     }
 
-    @Override
+    /**
+     * Method gets image bombs.
+     */
     public BufferedImage getBombsImg() {
         return bombImg;
     }
 
-    @Override
+    /**
+     * Method gets image mark of flag.
+     */
     public BufferedImage getFlagImg() {
         return flagImg;
     }
 
-    @Override
+    /**
+     * Method gets image mark of question.
+     */
     public BufferedImage getQuestionImg() {
         return questionImg;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void registerObserver(FieldObserver o) {
-        fieldObservers.add(o);
+    public void registerObserver(Observer o) {
+        observers.add(o);
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void removeObserver(FieldObserver o) {
-        int index = fieldObservers.indexOf(o);
-        if(index>=0) fieldObservers.remove(index);
+    public void removeObserver(Observer o) {
+        int index = observers.indexOf(o);
+        if(index>=0) observers.remove(index);
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void notifyObservers() {
-        for(FieldObserver item : fieldObservers){
-            item.update();
+    public void notifyObserversData() {
+        for(Observer item : observers){
+            item.updatePaint();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void startExplosion(int x, int y) {
-
-        try {
-            explosionLayer = new AnimateExplosionLayer(ImageIO.read(new File("pic/explosionSprite512_512.png")));
-            explosionLayer.setExplosionState(true);
-            explosionLayer.setExplosionCoordinates(x,y, CELLSIZE);
-            if(explosionTimer !=null&& explosionTimer.isRunning()) explosionTimer.stop();
-            explosionTimer = new Timer(60, this);
-            explosionTimer.start();
-
-        } catch (IOException e) {
-            explosionLayer = null;
+    public void notifyObserversAnimate() {
+        for(Observer item : observers){
+            item.updateAnimate();
         }
-
     }
 
-    @Override
+    /**
+     * Method for  launch event that describes of animation explosion in the transmitted coordinates.
+     * @param row - value of row where placed cell
+     * @param col - value of col where placed cell
+     */
+    public void startExplosion(int row, int col) {
+        animateExplosion.setStateAction(true);
+        animateExplosion.setCoordinatesAction(row,col, CELL_SIZE);
+        if(explosionTimer !=null&& explosionTimer.isRunning()) explosionTimer.stop();
+        explosionTimer = new Timer(explosionFrameDelay, this);
+        explosionTimer.start();
+    }
+
+    /**
+     * Method return array having a lenght four number that contains
+     * coordinates X1,Y1 (left corner) and X2,Y2 (right corner) for drawing subimage
+     */
     public int[] getExplosionCoordinates() {
-        return explosionLayer.getExplosionCoordinates();
+        return animateExplosion.getCoordinatesAction();
     }
 
-    @Override
+    /**
+     * The method return true until occurring getting the new frames action.
+     * @return true if has next frame
+     */
     public boolean getExplosionState() {
-        return explosionLayer.isExplosion();
+        return animateExplosion.isAction();
     }
 
-
-    @Override
+    /**
+     * Method used for handling events that timers generating.
+     */
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(explosionTimer)) {
-            if(explosionLayer.isExplosion()) {
-                explosionLayer.nextFrame();
-            }
-            else {
+            if(!animateExplosion.isAction()) {
                 explosionTimer.stop();
                 setBombFoundState(true);
             }
+            notifyObserversAnimate();
         }
-        else if(e.getSource().equals(clockTimer)&&getGameState()) {
+        if(e.getSource().equals(clockTimer)&&getGameState()) {
             if(currentTime<9999) currentTime++;
+            notifyObserversData();
         }
-        notifyObservers();
+
     }
 
-    @Override
+    /**
+     * Method gets current value game time.
+     */
     public int getCurrentTime() {
         return currentTime;
     }
 
-    @Override
+    /**
+     * Method use for stopping game timer.
+     */
     public void stopTime() {
        clockTimer.stop();
     }
 
-    @Override
+    /**
+     * Method returns image with next frame of animation explosion.
+     */
     public BufferedImage nextFrame() {
-        return explosionLayer.nextFrame();
+        return animateExplosion.nextFrameAction();
     }
 
-    @Override
+    /**
+     * Method check flag what indicate the bomb was found.
+     */
     public boolean checkBombFound() {
         return findBomb;
     }
 
-    @Override
+    /**
+     * Method sets state about finding bomb.
+     */
     public void setBombFoundState(boolean state) {
         findBomb = state;
     }
 
-    @Override
+    /**
+     * Method gets pointer event about starts game.
+     */
     public boolean getGameState() {
         return gameIsStart;
     }
