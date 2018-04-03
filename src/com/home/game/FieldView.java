@@ -178,14 +178,13 @@ public class FieldView<T extends GameField> implements Observer, ActionListener 
         menuInfo = new JMenu(" Info ");
         aboutGame = new JMenuItem(" About game");
         aboutGame.addActionListener((e)->JOptionPane.showMessageDialog(mainFrame,
-                "Приложение разработано по\n" +
-                        "аналоги с многим знакомой игрой\n" +
-                        "сапер, и реализует большую\n" +
-                        "часть её функционала.\n" +
-                        "Создано с целью демонстрации\n" +
-                        "навыков работы на языке Java.\n\n" +
-                        "Разработчик:                 Початрев В.В      \n" +
-                        "email:  v.postman2014@yandex.com\n\n"));
+                "The application is developed by analogy\n" +
+                        "with many familiar game minesweeper,\n" +
+                        "and implements most of its functionality.\n" +
+                        "Designed to demonstrate the skills\n" +
+                        "of working in the Java language\n\n"+
+                        "Developer:                          Pochtarev V.V.      \n" +
+                        "email:        v.postman2014@yandex.com\n\n"));
         addMenuBarMouseEnteredHandler(menuInfo);
         addMenuBarMouseExitingHandler(menuInfo);
         menuInfo.add(aboutGame);
