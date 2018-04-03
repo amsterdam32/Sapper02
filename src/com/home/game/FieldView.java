@@ -244,7 +244,7 @@ public class FieldView<T extends GameField> implements Observer, ActionListener 
                     height = Integer.parseInt(heightField.getText());
                     width = Integer.parseInt(widthField.getText());
                     numberBombs = Integer.parseInt(numberBombsField.getText());
-                    if(height<9||height>21||width<9||width>30||numberBombs<10||numberBombs>668) throw new NumberFormatException();
+                    if(height<9||height>21||width<9||width>30||numberBombs<10||numberBombs>629) throw new NumberFormatException();
                     if(numberBombs>height*width) throw new IndexOutOfBoundsException();
                     settingsFrame.dispose();
                     controller.newGame(height, width, numberBombs);
@@ -310,7 +310,7 @@ public class FieldView<T extends GameField> implements Observer, ActionListener 
         widthField = new JTextField("9");
         widthField.setEditable(false);
 
-        numberBombsFieldLabel = new JLabel("Number bombs (10-668)");
+        numberBombsFieldLabel = new JLabel("Number bombs (10-629)");
         numberBombsFieldLabel.setEnabled(false);
         numberBombsField = new JTextField("10");
         numberBombsField.setEditable(false);

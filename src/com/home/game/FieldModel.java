@@ -158,13 +158,27 @@ public class FieldModel implements Observable, ActionListener {
      */
     public void loadImg() throws IOException {
             try {
-                animateExplosion = new AnimateExplosion(ImageIO.read(new File("src/images/explosionSprite512_512.png")), 4, 4);
-                bombImg = ImageIO.read(new File("src/images/bomb40_40.png"));
-                flagImg = ImageIO.read(new File("src/images/flag40_40.png"));
-                questionImg = ImageIO.read(new File("src/images/questionMark40_40.png"));
-                undergroundImg = ImageIO.read(new File("src/images/ground600_600.jpg"));
-                surfaceImg = ImageIO.read(new File("src/images/grass600_600.jpg"));
-                lightSurfaceImg = ImageIO.read(new File("src/images/grassLight600_600.jpg"));
+                String imgExplosionPath = getClass().getResource("/images/explosionSprite512_512.png").getPath();
+                animateExplosion = new AnimateExplosion(ImageIO.read(new File(imgExplosionPath)), 4, 4);
+
+                String imgBombPath = getClass().getResource("/images/bomb40_40.png").getPath();
+                bombImg = ImageIO.read(new File(imgBombPath));
+
+                String imgFlagPath = getClass().getResource("/images/flag40_40.png").getPath();
+                flagImg = ImageIO.read(new File(imgFlagPath));
+
+                String imgQuestionPath = getClass().getResource("/images/questionMark40_40.png").getPath();
+                questionImg = ImageIO.read(new File(imgQuestionPath));
+
+                String imgUndergroundPath = getClass().getResource("/images/ground600_600.jpg").getPath();
+                undergroundImg = ImageIO.read(new File(imgUndergroundPath));
+
+                String imgSurfacePath = getClass().getResource("/images/grass600_600.jpg").getPath();
+                surfaceImg = ImageIO.read(new File(imgSurfacePath));
+
+                String imgLightSurfacePath = getClass().getResource("/images/grassLight600_600.jpg").getPath();
+                lightSurfaceImg = ImageIO.read(new File(imgLightSurfacePath));
+
                 tilesOfSurfaceImg = new TilesOfImageObjectsGame(surfaceImg, rowsInField, colsInField, getSurfaceImgScale());
                 tilesOfLightSurfaceImg = new TilesOfImageObjectsGame(lightSurfaceImg, rowsInField, colsInField, getSurfaceImgScale());
                 tilesOfUndergroundImg = new TilesOfImageObjectsGame(undergroundImg, rowsInField, colsInField, getUndergroundImgScale());
