@@ -5,8 +5,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -158,26 +158,26 @@ public class FieldModel implements Observable, ActionListener {
      */
     public void loadImg() throws IOException {
             try {
-                String imgExplosionPath = getClass().getResource("/images/explosionSprite512_512.png").getPath();
-                animateExplosion = new AnimateExplosion(ImageIO.read(new File(imgExplosionPath)), 4, 4);
+                URL imgExplosionPath = ClassLoader.getSystemResource("img/explosionSprite512_512.png");
+                animateExplosion = new AnimateExplosion(ImageIO.read(imgExplosionPath), 4, 4);
 
-                String imgBombPath = getClass().getResource("/images/bomb40_40.png").getPath();
-                bombImg = ImageIO.read(new File(imgBombPath));
+                URL imgBombPath = ClassLoader.getSystemResource("img/bomb40_40.png");
+                bombImg = ImageIO.read(imgBombPath);
 
-                String imgFlagPath = getClass().getResource("/images/flag40_40.png").getPath();
-                flagImg = ImageIO.read(new File(imgFlagPath));
+                URL imgFlagPath = ClassLoader.getSystemResource("img/flag40_40.png");
+                flagImg = ImageIO.read(imgFlagPath);
 
-                String imgQuestionPath = getClass().getResource("/images/questionMark40_40.png").getPath();
-                questionImg = ImageIO.read(new File(imgQuestionPath));
+                URL imgQuestionPath = ClassLoader.getSystemResource("img/questionMark40_40.png");
+                questionImg = ImageIO.read(imgQuestionPath);
 
-                String imgUndergroundPath = getClass().getResource("/images/ground600_600.jpg").getPath();
-                undergroundImg = ImageIO.read(new File(imgUndergroundPath));
+                URL imgUndergroundPath = ClassLoader.getSystemResource("img/ground600_600.jpg");
+                undergroundImg = ImageIO.read(imgUndergroundPath);
 
-                String imgSurfacePath = getClass().getResource("/images/grass600_600.jpg").getPath();
-                surfaceImg = ImageIO.read(new File(imgSurfacePath));
+                URL imgSurfacePath = ClassLoader.getSystemResource("img/grass600_600.jpg");
+                surfaceImg = ImageIO.read(imgSurfacePath);
 
-                String imgLightSurfacePath = getClass().getResource("/images/grassLight600_600.jpg").getPath();
-                lightSurfaceImg = ImageIO.read(new File(imgLightSurfacePath));
+                URL imgLightSurfacePath = ClassLoader.getSystemResource("img/grassLight600_600.jpg");
+                lightSurfaceImg = ImageIO.read(imgLightSurfacePath);
 
                 tilesOfSurfaceImg = new TilesOfImageObjectsGame(surfaceImg, rowsInField, colsInField, getSurfaceImgScale());
                 tilesOfLightSurfaceImg = new TilesOfImageObjectsGame(lightSurfaceImg, rowsInField, colsInField, getSurfaceImgScale());
